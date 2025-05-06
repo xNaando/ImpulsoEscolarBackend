@@ -21,27 +21,30 @@ export default async function handler(req, res) {
     }
 
     // Usar a variável de ambiente para a chave da API
-    const apiKey = process.env.ASTICA_API_KEY;
+    const apiKey = process.env.OPEN_ROUTER_AI;
 
     if (!apiKey) {
-      return res.status(500).json({ error: 'Chave da API astica não configurada' });
+      return res.status(500).json({ error: 'Chave da API OpenRouter não configurada' });
     }
 
-    const response = await fetch('https://vision.astica.ai/describe', {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
       body: JSON.stringify({
-        tkn: apiKey,
-        modelVersion: '2.5_full',
-        input: prompt,
-        visionParams: 'gpt,describe,describe_all,tags,objects'
+        model: 'deepseek-v3-32k',
+        messages: [
+          { role: 'user', content: prompt }
+        ]
       })
     });
 
     const data = await response.json();
 
-    if (data.status && data.status === 'error') {
-      throw new Error(data.error || 'Erro na API astica');
+    if (data.error) {
+      throw new Error(data.error.message || 'Erro na API OpenRouter');
     }
 
     return res.status(200).json(data);
