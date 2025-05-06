@@ -23,6 +23,9 @@ export default async function handler(req, res) {
     // Usar a variável de ambiente para a chave da API
     const apiKey = process.env.OPEN_ROUTER_AI;
 
+    // Log para depuração
+    console.log('OPEN_ROUTER_AI:', apiKey ? apiKey.substring(0, 8) + '...' : 'NÃO DEFINIDA');
+
     if (!apiKey) {
       return res.status(500).json({ error: 'Chave da API OpenRouter não configurada' });
     }
