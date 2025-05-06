@@ -1,22 +1,25 @@
 # Backend para Projeto Escolar (Vercel)
 
-Este backend expõe um endpoint para retornar a chave da API do ChatGPT para uso no frontend.
+Este backend expõe um endpoint para integração com a API astica.
 
 ## Como usar
 
 1. **Clone este repositório**
 2. **Faça o deploy na Vercel**
 3. O endpoint estará disponível em:
-   `/api/get-openai-key`
+   `/api/pergunta`
 
 ### Exemplo de uso no frontend
 
 ```js
-fetch('/api/get-openai-key')
+fetch('/api/pergunta', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ prompt: 'Seu prompt ou URL de imagem aqui' })
+})
   .then(res => res.json())
   .then(data => {
-    const openaiKey = data.openaiKey;
-    // use a chave como precisar
+    // use a resposta da astica como precisar
   });
 ```
 
