@@ -26,39 +26,39 @@ export default async function handler(req, res) {
     }
 
     // Usar a chave da variável de ambiente
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.ASTICA_API_KEY;
 
     if (!apiKey) {
-      return res.status(500).json({ error: 'Chave da API não configurada' });
+      return res.status(500).json({ error: 'Chave da API astica não configurada' });
     }
 
-    console.log('[API] Usando chave da variável de ambiente para a API OpenAI');
+    console.log('[API] Usando chave da variável de ambiente para a API astica');
 
-    console.log('[API] Enviando requisição para OpenAI...');
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Chamada para a API astica
+    const response = await fetch('https://vision.astica.ai/describe', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.7
+        tkn: apiKey,
+        modelVersion: '2.5_full',
+        input: prompt, // prompt agora é a URL da imagem
+        visionParams: 'gpt,describe,describe_all,tags,objects'
       })
     });
 
     if (!response.ok) {
-      throw new Error(`Erro na API do OpenAI: ${response.status} ${response.statusText}`);
+      throw new Error(`Erro na API astica: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
 
-    if (data.error) {
-      throw new Error(data.error.message || 'Erro na API do OpenAI');
+    if (data.status && data.status === 'error') {
+      throw new Error(data.error || 'Erro na API astica');
     }
 
-    console.log('[API] Resposta recebida com sucesso');
+    console.log('[API] Resposta recebida com sucesso da astica');
     return res.status(200).json(data);
   } catch (error) {
     const loggedError = logError('Erro ao processar pergunta', error);
