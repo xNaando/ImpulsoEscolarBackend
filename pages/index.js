@@ -11,7 +11,9 @@ export default function Home() {
   const [selectedOption, setSelectedOption] = useState(null);
 
   useEffect(() => {
-    loadNewQuestion();
+    if (typeof window !== 'undefined') {
+      loadNewQuestion();
+    }
   }, []);
 
   const parseQuestion = (raw) => {
@@ -54,6 +56,7 @@ export default function Home() {
   };
 
   const loadNewQuestion = async () => {
+    if (typeof window === 'undefined') return;
     setIsLoading(true);
     setSelectedOption(null);
     
@@ -117,7 +120,6 @@ export default function Home() {
         <meta name="description" content="Quiz educacional para estudantes" />
         <link rel="icon" href="/favicon.ico" />
         <meta httpEquiv="Content-Language" content="pt-BR" />
-        <html lang="pt-BR" />
       </Head>
 
       <header className={styles.header}>
