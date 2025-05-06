@@ -116,6 +116,8 @@ export default function Home() {
         <title>Quiz Educacional</title>
         <meta name="description" content="Quiz educacional para estudantes" />
         <link rel="icon" href="/favicon.ico" />
+        <meta httpEquiv="Content-Language" content="pt-BR" />
+        <html lang="pt-BR" />
       </Head>
 
       <header className={styles.header}>

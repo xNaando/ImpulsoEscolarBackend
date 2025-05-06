@@ -20,8 +20,9 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Prompt é obrigatório' });
     }
 
-    // Usar a variável de ambiente para a chave da API
-    const apiKey = process.env.OPENAI_API_KEY;
+    // Tentar usar a variável de ambiente para a chave da API
+    // Se não estiver disponível, usar uma chave fixa (apenas para desenvolvimento)
+    const apiKey = process.env.OPENAI_API_KEY || 'sk-jK2m5X3NqW2Y4X9Z7T3BlbkFJjNwSxYzPqRmN8OvW1A2C3D4';
     
     if (!apiKey) {
       return res.status(500).json({ error: 'Chave da API não configurada' });
