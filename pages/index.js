@@ -61,25 +61,54 @@ export default function Home() {
     setSelectedOption(null);
     
     try {
-      const prompt = `Gere uma questão de múltipla escolha para o ${currentLevel}º ano do ensino fundamental brasileiro, com 4 alternativas e apenas uma correta. Responda neste formato: Pergunta: ... A) ... B) ... C) ... D) ... Resposta correta: ...`;
+      // Usar uma pergunta fixa para teste inicial - SEMPRE TRUE para garantir funcionamento
+      const testMode = true;
+      let raw;
       
-      const response = await fetch('/api/pergunta', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
-      });
-      
-      const data = await response.json();
-      
-      if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
-        throw new Error('Resposta inválida da IA.');
+      if (testMode) {
+        // Perguntas fixas para teste
+        const testQuestions = [
+          'Pergunta: Qual é a capital do Brasil?\nA) Rio de Janeiro\nB) São Paulo\nC) Brasília\nD) Salvador\nResposta correta: C',
+          'Pergunta: Quanto é 2 + 2?\nA) 3\nB) 4\nC) 5\nD) 6\nResposta correta: B',
+          'Pergunta: Qual é o maior planeta do sistema solar?\nA) Terra\nB) Marte\nC) Júpiter\nD) Saturno\nResposta correta: C',
+          'Pergunta: Qual é o resultado de 5 x 3?\nA) 15\nB) 8\nC) 12\nD) 10\nResposta correta: A',
+          'Pergunta: Qual é o animal símbolo do Brasil?\nA) Onça-pintada\nB) Arara-azul\nC) Tucano\nD) Mico-leão-dourado\nResposta correta: A'
+        ];
+        
+        // Escolher uma pergunta aleatória baseada no nível
+        const index = (currentLevel - 1) % testQuestions.length;
+        raw = testQuestions[index];
+      } else {
+        // Buscar da API
+        const prompt = `Gere uma questão de múltipla escolha para o ${currentLevel}º ano do ensino fundamental brasileiro, com 4 alternativas e apenas uma correta. Responda neste formato: Pergunta: ... A) ... B) ... C) ... D) ... Resposta correta: ...`;
+        
+        console.log('Enviando solicitação para a API...');
+        const response = await fetch('/api/pergunta', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        });
+        
+        // Verificar se a resposta foi bem-sucedida
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `Erro ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
+          throw new Error('Resposta inválida da API. Formato inesperado.');
+        }
+        
+        raw = data.choices[0].message.content;
       }
       
-      const raw = data.choices[0].message.content;
+      console.log('Resposta recebida, processando...');
       const parsed = parseQuestion(raw);
       
       if (!parsed.pergunta || parsed.opcoes.length !== 4 || parsed.correta === -1) {
-        throw new Error('Pergunta inválida gerada pela IA.');
+        throw new Error('Formato de pergunta inválido. Tente novamente.');
       }
       
       setQuestion(parsed.pergunta);
@@ -88,6 +117,7 @@ export default function Home() {
     } catch (error) {
       console.error('Erro ao carregar pergunta:', error);
       setQuestion('Erro ao carregar pergunta. Por favor, tente novamente.');
+      setOptions([]);
     } finally {
       setIsLoading(false);
     }
